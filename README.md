@@ -1,4 +1,4 @@
-# üß™ QSAR_Tools
+# QSAR_Tools
 
 **Universal QSAR Pipeline for Virtual Screening of Molecular Libraries**
 
@@ -9,7 +9,7 @@
 
 ---
 
-## üìå Overview
+## Overview
 
 **QSAR_Tools** is an interactive Google Colab notebook that implements a complete **Quantitative Structure-Activity Relationship (QSAR)** pipeline ‚Äî from raw ChEMBL bioactivity data to a ranked list of molecular candidates ready for molecular docking.
 
@@ -19,52 +19,52 @@ The notebook is fully generalizable: by changing just **5 variables**, any resea
 
 ---
 
-## üéØ What does this notebook do?
+## What does this notebook do?
 
 ```
 ChEMBL bioactivity data (IC50 / Ki / EC50)
-        ‚Üì
+        |
     Data curation & standardization
-        ‚Üì
+        |
     Molecular descriptor calculation (RDKit 2D + ECFP4)
-        ‚Üì
+        |
     QSAR model training (Random Forest / XGBoost / SVM)
-        ‚Üì
+        |
     5-fold cross-validation + external test set evaluation
-        ‚Üì
+        |
     Virtual screening of user-provided molecular library
-        ‚Üì
+        |
     Applicability Domain (Williams Plot)
-        ‚Üì
+        |
     SAR analysis with SHAP values
-        ‚Üì
+        |
     ADMET profiling (Lipinski, Veber, PAINS, QED)
-        ‚Üì
+        |
     Analog generation by scaffold modification
-        ‚Üì
+        |
     TOP N candidates + SMILES ready for AutoDock Vina
 ```
 
 ---
 
-## üìÇ Repository Structure
+## Repository Structure
 
 ```
 QSAR_Tools/
-‚îÇ
-‚îú‚îÄ‚îÄ QSAR_Universal_Interactive_EN.ipynb   # Main notebook (English, full pipeline)
-‚îú‚îÄ‚îÄ PASO0_Convertir_PNDBCOL_a_CSV.ipynb  # Utility: convert raw text DB to CSV
-‚îú‚îÄ‚îÄ README.md                             # This file
-‚îî‚îÄ‚îÄ LICENSE
+|
+|-- QSAR_Universal_Interactive_EN.ipynb   # Main notebook (English, full pipeline)
+|-- PASO0_Convertir_PNDBCOL_a_CSV.ipynb  # Utility: convert raw text DB to CSV
+|-- README.md                             # This file
+|-- LICENSE
 ```
 
 ---
 
-## üöÄ Quick Start
+## Quick Start
 
 ### Option 1 ‚Äî Google Colab (recommended, no installation needed)
 
-1. Click the **Open in Colab** badge above
+1. Click the **Open in Colab** badge at the top
 2. Run the installation cell (Module 0) ‚Äî takes ~4 min on first run
 3. Edit the 5 configuration variables in the config cell
 4. Run all cells sequentially
@@ -76,14 +76,15 @@ QSAR_Tools/
 git clone https://github.com/Sbolivar16/QSAR_Tools.git
 cd QSAR_Tools
 
-pip install rdkit chembl-webresource-client xgboost shap mols2grid scikit-learn pandas numpy matplotlib seaborn
+pip install rdkit chembl-webresource-client xgboost shap mols2grid \
+            scikit-learn pandas numpy matplotlib seaborn
 
 jupyter notebook QSAR_Universal_Interactive_EN.ipynb
 ```
 
 ---
 
-## ‚öôÔ∏è Configuration ‚Äî 5 Variables
+## Configuration ‚Äî 5 Variables
 
 The only section you need to edit before running:
 
@@ -110,7 +111,7 @@ TOP_N         = 10                  # Number of final candidates
 
 ---
 
-## üìä Outputs
+## Outputs
 
 After running the full pipeline, a ZIP file is generated containing:
 
@@ -126,14 +127,14 @@ After running the full pipeline, a ZIP file is generated containing:
 | `08_analogs.png` | Generated analogs from top hits |
 | `TOP_candidates_docking.csv` | Ranked candidates with all properties |
 | `full_screening_results.csv` | Complete screening results |
-| `SMILES_for_Vina.smi` | SMILES ready for OpenBabel ‚Üí Vina |
+| `SMILES_for_Vina.smi` | SMILES ready for OpenBabel -> AutoDock Vina |
 | `ADMET_profile.csv` | Full ADMET table |
 | `analogs_generated.csv` | Analogs with predicted activities |
 | `STUDY_SUMMARY.txt` | Parameters, metrics, and references |
 
 ---
 
-## üî¨ Methods
+## Methods
 
 ### Data Source
 Bioactivity data retrieved from [ChEMBL](https://www.ebi.ac.uk/chembl/) using the official Python API (`chembl-webresource-client`).
@@ -144,14 +145,15 @@ Bioactivity data retrieved from [ChEMBL](https://www.ebi.ac.uk/chembl/) using th
 3. Validate SMILES with RDKit
 4. Standardize structures (remove salts, largest fragment)
 5. Deduplicate by molecule (median activity)
-6. Assign binary labels: ACTIVE (‚â§ threshold nM) / INACTIVE (> threshold nM)
+6. Assign binary labels: ACTIVE (<= threshold nM) / INACTIVE (> threshold nM)
 
 ### Descriptors
 - **RDKit 2D descriptors** (~200 physicochemical properties)
 - **Feature selection**: NaN filter (>20%), zero variance, Pearson correlation (r > 0.95)
 - **Scaling**: StandardScaler (mean=0, std=1)
 
-### Models
+### Machine Learning Models
+
 | Algorithm | Hyperparameters |
 |-----------|----------------|
 | Random Forest | n_estimators=300, class_weight='balanced' |
@@ -165,110 +167,129 @@ Bioactivity data retrieved from [ChEMBL](https://www.ebi.ac.uk/chembl/) using th
 
 ### Applicability Domain
 Leverage method (Williams Plot):
-- Hat value h = x(X·µÄX)‚Åª¬πx·µÄ
-- Threshold h* = 3(k+1)/n
+- Hat value: h = x(X'X)^-1 x'
+- Threshold: h* = 3(k+1)/n
 
 ### SAR Analysis
-SHAP (SHapley Additive exPlanations) using `TreeExplainer` (RF/XGB) or `KernelExplainer` (SVM).
+SHAP (SHapley Additive exPlanations) using `TreeExplainer` (Random Forest / XGBoost) or `KernelExplainer` (SVM).
 
 ### ADMET Profile
-- Lipinski Rule-of-Five (MW ‚â§ 500, logP ‚â§ 5, HBD ‚â§ 5, HBA ‚â§ 10)
-- Veber rules (TPSA ‚â§ 140 ≈≤, RotBonds ‚â§ 10)
+- Lipinski Rule-of-Five (MW <= 500, logP <= 5, HBD <= 5, HBA <= 10)
+- Veber rules (TPSA <= 140 A^2, RotBonds <= 10)
 - PAINS structural alerts (RDKit FilterCatalog)
 - QED ‚Äî Quantitative Estimate of Drug-likeness
 
 ### Analog Generation
 Simplified Matched Molecular Pairs (MMP) strategy using RDKit reaction SMARTS:
-- OH ‚Üí F (bioisostere)
-- OH ‚Üí OMe (increased lipophilicity)
-- Ph ‚Üí Pyridine (reduced logP)
-- NH‚ÇÇ ‚Üí NHMe (cell permeability)
-- Me ‚Üí CF‚ÇÉ (metabolic stability)
+- OH -> F (bioisostere)
+- OH -> OMe (increased lipophilicity)
+- Ph -> Pyridine (reduced logP)
+- NH2 -> NHMe (improved cell permeability)
+- Me -> CF3 (metabolic stability)
 
 ---
 
-## üìã Next Steps After This Notebook
+## Next Steps After This Notebook
+
+This notebook is **Step 1** of a complete multi-scale in silico pipeline:
 
 ```
 QSAR (this notebook)
-    ‚Üì  Top N candidates selected
-Molecular Docking (AutoDock Vina)
-    ‚Üí obabel -ismi SMILES_for_Vina.smi -O candidates.sdf --gen3d -h
-    ‚Üí vina --receptor receptor.pdbqt --ligand ligand.pdbqt --out result.pdbqt
-    ‚Üì  Top 3-5 docking poses
+    |
+    v  Top N candidates selected
+    |
+Molecular Docking (AutoDock Vina / Glide)
+    |  obabel -ismi SMILES_for_Vina.smi -O candidates.sdf --gen3d -h
+    |  vina --receptor receptor.pdbqt --ligand ligand.pdbqt --out result.pdbqt
+    |
+    v  Top 3-5 docking poses
+    |
 Molecular Dynamics (AMBER / GROMACS)
-    ‚Üí 100-200 ns production run
-    ‚Üí RMSD, RMSF, H-bond occupancy analysis
-    ‚Üì
+    |  100-200 ns production run
+    |  RMSD, RMSF, H-bond occupancy analysis
+    |
+    v
 MM-PBSA / MM-GBSA
-    ‚Üí Binding free energy calculation
-    ‚Üí Per-residue energy decomposition
-    ‚Üì  Final 1-2 candidates for publication
+    |  Binding free energy calculation
+    |  Per-residue energy decomposition
+    |
+    v  Final 1-2 candidates for publication
 ```
 
 ---
 
-## üì¶ Dependencies
+## Validation Metrics ‚Äî Interpretation Guide
 
-| Library | Version | Purpose |
-|---------|---------|---------|
-| `rdkit` | ‚â• 2023.03 | Molecular descriptors, SMILES handling |
-| `chembl-webresource-client` | ‚â• 0.10 | ChEMBL API access |
-| `scikit-learn` | ‚â• 1.3 | ML models, validation |
-| `xgboost` | ‚â• 2.0 | Gradient boosting classifier |
-| `shap` | ‚â• 0.44 | SHAP explainability |
-| `pandas` | ‚â• 2.0 | Data manipulation |
-| `numpy` | ‚â• 1.24 | Numerical computing |
-| `matplotlib` | ‚â• 3.7 | Visualization |
-| `seaborn` | ‚â• 0.12 | Statistical plots |
-| `mols2grid` | ‚â• 2.0 | Interactive molecular grids |
+| Metric | Good value | Interpretation |
+|--------|-----------|----------------|
+| ROC-AUC | >= 0.75 | Discriminative power (0.5 = random) |
+| MCC | >= 0.40 | Best metric for imbalanced datasets |
+| Balanced Accuracy | >= 0.70 | Unbiased accuracy |
+| Sensitivity | >= 0.65 | Fraction of actives correctly identified |
+| Specificity | >= 0.65 | Fraction of inactives correctly rejected |
 
 ---
 
-## üìñ Citation
+## Dependencies
+
+| Library | Version | Purpose |
+|---------|---------|---------|
+| `rdkit` | >= 2023.03 | Molecular descriptors, SMILES handling |
+| `chembl-webresource-client` | >= 0.10 | ChEMBL API access |
+| `scikit-learn` | >= 1.3 | ML models, validation |
+| `xgboost` | >= 2.0 | Gradient boosting classifier |
+| `shap` | >= 0.44 | SHAP explainability |
+| `pandas` | >= 2.0 | Data manipulation |
+| `numpy` | >= 1.24 | Numerical computing |
+| `matplotlib` | >= 3.7 | Visualization |
+| `seaborn` | >= 0.12 | Statistical plots |
+| `mols2grid` | >= 2.0 | Interactive molecular grids |
+
+---
+
+## Citation
 
 If you use this notebook in your research, please cite:
 
 ```bibtex
 @software{QSAR_Tools_2025,
-  author  = {Bolivar S.},
-  title   = {QSAR\_Tools: Universal QSAR Pipeline for Virtual Screening},
+  author  = {Bolivar, S.},
+  title   = {QSAR_Tools: Universal QSAR Pipeline for Virtual Screening},
   year    = {2025},
   url     = {https://github.com/Sbolivar16/QSAR_Tools},
-  note    = {Google Colab notebook}
+  note    = {Google Colab interactive notebook}
 }
 ```
 
-**Key references for the methods used:**
+**Key references:**
 
-- Mendez D, et al. (2019) ChEMBL: towards direct deposition of bioassay data. *Nucleic Acids Research* 47:D930‚ÄìD940
-- Pedregosa F, et al. (2011) Scikit-learn: Machine Learning in Python. *JMLR* 12:2825‚Äì2830
-- Chen T, Guestrin C (2016) XGBoost: A Scalable Tree Boosting System. *KDD*
-- Lundberg SM, Lee SI (2017) A unified approach to interpreting model predictions. *NeurIPS*
-- Lipinski CA, et al. (1997) Experimental and computational approaches to estimate solubility and permeability. *Adv Drug Deliv Rev* 23:3‚Äì25
-- Veber DF, et al. (2002) Molecular properties that influence oral bioavailability. *J Med Chem* 45:2615‚Äì2623
-- Tropsha A, et al. (2003) The importance of being earnest: validation is the absolute essential for successful application of QSAR models. *QSAR Comb Sci* 22:69‚Äì77
-- Bickerton GR, et al. (2012) Quantifying the chemical beauty of drugs. *Nature Chemistry* 4:90‚Äì98
+- Mendez D, et al. (2019) ChEMBL: towards direct deposition of bioassay data. *Nucleic Acids Research* 47:D930-D940
+- Pedregosa F, et al. (2011) Scikit-learn: Machine Learning in Python. *JMLR* 12:2825-2830
+- Chen T & Guestrin C (2016) XGBoost: A Scalable Tree Boosting System. *KDD*
+- Lundberg SM & Lee SI (2017) A unified approach to interpreting model predictions. *NeurIPS*
+- Lipinski CA, et al. (1997) Experimental and computational approaches to estimate solubility and permeability. *Adv Drug Deliv Rev* 23:3-25
+- Veber DF, et al. (2002) Molecular properties that influence oral bioavailability. *J Med Chem* 45:2615-2623
+- Tropsha A, et al. (2003) The importance of being earnest: validation is the absolute essential for successful QSAR. *QSAR Comb Sci* 22:69-77
+- Bickerton GR, et al. (2012) Quantifying the chemical beauty of drugs. *Nature Chemistry* 4:90-98
 
 ---
 
-## üìÑ License
+## License
 
 This project is licensed under the MIT License ‚Äî see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## ü§ù Contributing
+## Contributing
 
 Contributions are welcome. Please open an issue first to discuss what you would like to change.
 
 ---
 
-## üë§ Author
+## Author
 
-**Sbolivar16**  
+**Sbolivar16**
 *In silico drug discovery | Molecular docking | Molecular dynamics | QSAR*
 
-> *This tool was developed to support research on anti-dengue compounds from Colombian natural products, but is designed to be universally applicable to any target with ChEMBL bioactivity data.*
-
+> *This tool was developed to support research on anti-dengue compounds from Colombian natural products, but is designed to be universally applicable to any ChEMBL target.*
 
