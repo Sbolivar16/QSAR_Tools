@@ -2,7 +2,7 @@
 
 **Universal QSAR Pipeline for Virtual Screening of Molecular Libraries**
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Sbolivar16/QSAR_Tools/blob/main/QSAR_Universal_Interactive_EN.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Sbolivar16/QSAR_Tools/blob/main/QSAR_Universal_Interactive.ipynb)
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
 [![RDKit](https://img.shields.io/badge/RDKit-2023+-green.svg)](https://www.rdkit.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -11,7 +11,7 @@
 
 ## Overview
 
-**QSAR_Tools** is an interactive Google Colab notebook that implements a complete **Quantitative Structure-Activity Relationship (QSAR)** pipeline ‚Äî from raw ChEMBL bioactivity data to a ranked list of molecular candidates ready for molecular docking.
+**QSAR_Tools** is an interactive Google Colab notebook that implements a complete **Quantitative Structure-Activity Relationship (QSAR)** pipeline — from raw ChEMBL bioactivity data to a ranked list of molecular candidates ready for molecular docking.
 
 The notebook is fully generalizable: by changing just **5 variables**, any researcher can adapt it to any therapeutic target available in ChEMBL, screen any molecular library in CSV format, and obtain publication-ready results.
 
@@ -52,8 +52,7 @@ ChEMBL bioactivity data (IC50 / Ki / EC50)
 ```
 QSAR_Tools/
 |
-|-- QSAR_Universal_Interactive_EN.ipynb   # Main notebook (English, full pipeline)
-|-- PASO0_Convertir_PNDBCOL_a_CSV.ipynb  # Utility: convert raw text DB to CSV
+|-- QSAR_Universal_Interactive.ipynb   # Main notebook (English, full pipeline)
 |-- README.md                             # This file
 |-- LICENSE
 ```
@@ -62,15 +61,15 @@ QSAR_Tools/
 
 ## Quick Start
 
-### Option 1 ‚Äî Google Colab (recommended, no installation needed)
+### Option 1 — Google Colab (recommended, no installation needed)
 
 1. Click the **Open in Colab** badge at the top
-2. Run the installation cell (Module 0) ‚Äî takes ~4 min on first run
+2. Run the installation cell (Module 0) — takes ~4 min on first run
 3. Edit the 5 configuration variables in the config cell
 4. Run all cells sequentially
 5. Download the results ZIP at the end
 
-### Option 2 ‚Äî Local installation
+### Option 2 — Local installation
 
 ```bash
 git clone https://github.com/Sbolivar16/QSAR_Tools.git
@@ -79,12 +78,12 @@ cd QSAR_Tools
 pip install rdkit chembl-webresource-client xgboost shap mols2grid \
             scikit-learn pandas numpy matplotlib seaborn
 
-jupyter notebook QSAR_Universal_Interactive_EN.ipynb
+jupyter notebook QSAR_Universal_Interactive.ipynb
 ```
 
 ---
 
-## Configuration ‚Äî 5 Variables
+## Configuration — 5 Variables
 
 The only section you need to edit before running:
 
@@ -122,7 +121,7 @@ After running the full pipeline, a ZIP file is generated containing:
 | `03_test_evaluation.png` | ROC curve and confusion matrix |
 | `04_williams_plot.png` | Applicability Domain (Williams Plot) |
 | `05_top_structures.png` | 2D structures of top candidates |
-| `06_shap_SAR.png` | SAR analysis ‚Äî SHAP summary plot |
+| `06_shap_SAR.png` | SAR analysis — SHAP summary plot |
 | `07_admet_qed.png` | Drug-likeness profile (QED) |
 | `08_analogs.png` | Generated analogs from top hits |
 | `TOP_candidates_docking.csv` | Ranked candidates with all properties |
@@ -177,7 +176,7 @@ SHAP (SHapley Additive exPlanations) using `TreeExplainer` (Random Forest / XGBo
 - Lipinski Rule-of-Five (MW <= 500, logP <= 5, HBD <= 5, HBA <= 10)
 - Veber rules (TPSA <= 140 A^2, RotBonds <= 10)
 - PAINS structural alerts (RDKit FilterCatalog)
-- QED ‚Äî Quantitative Estimate of Drug-likeness
+- QED — Quantitative Estimate of Drug-likeness
 
 ### Analog Generation
 Simplified Matched Molecular Pairs (MMP) strategy using RDKit reaction SMARTS:
@@ -218,7 +217,7 @@ MM-PBSA / MM-GBSA
 
 ---
 
-## Validation Metrics ‚Äî Interpretation Guide
+## Validation Metrics — Interpretation Guide
 
 | Metric | Good value | Interpretation |
 |--------|-----------|----------------|
@@ -276,7 +275,7 @@ If you use this notebook in your research, please cite:
 
 ## License
 
-This project is licensed under the MIT License ‚Äî see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
 ---
 
